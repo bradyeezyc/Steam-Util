@@ -44,11 +44,77 @@ for(int i = 0;i<su.Users.Length;i++){
 }
 
 ```
+## Documentation
 
+#### Steam Util
+
+##### Fields
 ```c#
-Compare_With_Email(User user, String EmailDomain)
+String[] Proxies;
+String[] Emails;
+String[] Legacy_IDS;
+String[] Tempemails;
+String[] FullEmails;
 ```
 
+> Compares the display name with an email to see if we can guess the account name.
+
+```c#
+Boolean Compare_With_Email(User user, String EmailDomain)
+```
+
+> Helper method, Good used in conjunction with the above method.
+
+```c#
+Boolean IsInLastYear(DateTime dt)
+```
+
+> Returns a User struct of information retaining to the user. Supports 64ID, Legacy ID and account name.
+```c#
+User GetFullInformationOfSteamUser_ID(long ID)
+User GetFullInformationOfSteamUser_Legacy(String user)
+User GetFullInformationOfSteamUser_User(String user)
+```
+> Gets the Vac ban, Economy ban and Community ban status of a user.
+
+```c#
+BanJson.Player GetBanInfo(long ID)
+```
+
+> Gets a full list of information of a user using Steam's API
+
+```c#
+PlayerSum.Player GetPlayerSum(long ID)
+```
+
+> Converts ID64 to Legacy IDS (STEAM_0:0:123)
+
+```c#
+IEnumerator<String> Convert_To_Legacy(Int64[] IDList)
+String Convert_To_Legacy(Int64 ID)
+```
+
+> Converts Legacy IDS to ID64.
+
+```c#
+IEnumerator<Int64> Convert_To_64ID(String[] uList)
+Int64 Convert_To_64ID(String user)
+```
+
+> Checks if the account is registered
+
+```c#
+Boolean Check_User_Registered(String u)
+Boolean Check_User_Registered(String u, String[] Proxy)
+```
+
+### Steam Check
+
+> Gets the ID64 of any steam account, will return -1 if that account doesn't exist.
+
+```c#
+String GrabIDFromUsername(String user)
+```
 
 
 
