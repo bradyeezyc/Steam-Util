@@ -6,7 +6,7 @@
 
 ### Code Examples
 ###### Example 1 
-<pre>
+```c#
 SteamCheck sc = new SteamCheck();
 var id = sc.GrabIDFromUser("username");
 if(id != "-1"){
@@ -14,9 +14,9 @@ if(id != "-1"){
 }else{
 	Console.Writeline("Username does not exist");
 }
-</pre>
+```
 ###### Example 2
-<pre>
+```c#
 SteamUtil sU = new SteamUtil();
 User user = sU.GetFullInformationOfSteamUser_Legacy("STEAM_0:0:123");
 if(user.Exists){
@@ -25,7 +25,30 @@ if(user.Exists){
 		Console.Writeline($"The login is {user.user.PossibleSteamUsername}@hotmail.com");
 	}
 }
-</pre>
+```
+###### Eample 3
+```c#
+
+Boolean check = su.Check_User_Registered("test");
+if(check){
+	Console.Writeline("Registered!");
+}
+
+su.Proxies = File.ReadAllLines("proxies.txt");
+su.Users = File.ReadAllLines("users.txt");
+
+for(int i = 0;i<su.Users.Length;i++){
+	if(su.Check_User_Registered(su.Users[i],su.Proxies)){
+		Console.Writeline("This account is registered");
+	}
+}
+
+```
+
+```c#
+Compare_With_Email(User user, String EmailDomain)
+```
+
 
 
 
