@@ -117,4 +117,7 @@ String GrabIDFromUsername(String user)
 ```
 
 
+## Dependencies
 
+> SteamKit2
+> Newtonsoft.json
