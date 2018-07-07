@@ -4,25 +4,23 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Net;
+using PlayerSum;
+using BanJson;
 
-namespace SteamUlti
+namespace SteamUtil
 {
     /// <summary>
-    /// Steam Ulti Library.
+    /// Steam Util Library.
     /// </summary>
-    public class SteamUlti
+    public class SteamUtil
     {
 
         public String STEAM_URL = "http://steamcommunity.com/profiles/";
 
         private static SteamCheck SteamCheck = new SteamCheck();
 
-        private String[] CommonEmails { get => CommonEmails; set => CommonEmails = value; }
-        private String[] FullEmails { get => FullEmails; set => FullEmails = value; }
-        private String[] TempEmails { get => TempEmails; set => TempEmails = value; }
-        private String[] Users { get => Users; set => Users = value; }
+        private String[] Emails { get => Emails; set => Emails = value; }
         private String[] Proxies { get => Proxies; set => Proxies = value; }
-        private String[] Legacy_IDS { get => Legacy_IDS; set => Legacy_IDS = value; }
 
         private int ProxyUse = 0;
         private int pIndex = 0;
@@ -51,7 +49,7 @@ namespace SteamUlti
         /// <returns><c>true</c>, if with email was was found as the login for the account, <c>false</c> otherwise.</returns>
         /// <param name="user">User.</param>
         /// <param name="EmailDomain">Email domain.</param>
-        public Boolean Compare_With_Email(User user, String EmailDomain)
+        public Boolean CompareAccountWithEmail(User user, String EmailDomain)
         {
             var test = SteamCheck.GrabIDFromUsername(user.PossibleSteamUsername + EmailDomain);
             if (test != "-1" && long.Parse(test) == user.Steam64ID)
@@ -67,120 +65,123 @@ namespace SteamUlti
         /// </summary>
         /// <returns>The full information of steam user identifier.</returns>
         /// <param name="ID">Identifier.</param>
-        public User GetFullInformationOfSteamUser_ID(long ID)
+        public User GetFullInformationOfSteamUserID(long ID)
         {
-            User u = new User();
-            PlayerSum.Player sums;
-            BanJson.Player player;
+            User user = new User();
+            Player sums;
+            PlayerBan player;
 
-            u.SteamUsername = "-1";
-            u.Steam64ID = ID;
+            //account name is unknown at this time.
+            user.SteamUsername = "-1";
+
+            user.Steam64ID = ID;
             try
             {
-                player = GetBanInfo(u.Steam64ID);
-                sums = GetPlayerSum(u.Steam64ID);
-                u.CommBan = player.CommunityBanned;
-                u.EcoBan = !player.EconomyBan.Contains("none");
-                u.VacBan = player.VacBanned;
-                u.PossibleSteamUsername = GetPlayerSum(ID).Personaname;
-                u.LeagacyID = IDToRealSteamID(ID);
-                u.Exists = true;
-                u.ProfileSet = sums.Profilestate == 1;
-                u.ProfileURL = STEAM_URL + u.Steam64ID;
-                u.LastOnline = UnixTimeStampToDateTime(sums.Lastlogoff);
-                u.TimeCreated = UnixTimeStampToDateTime(sums.Timecreated);
+                player = GetBanInfo(user.Steam64ID);
+                sums = GetPlayerSum(user.Steam64ID);
+                user.CommBan = player.CommunityBanned;
+                user.EcoBan = !player.EconomyBan.Contains("none");
+                user.VacBan = player.VacBanned;
+                user.PossibleSteamUsername = GetPlayerSum(ID).Personaname;
+                user.LeagacyID = IDToRealSteamID(ID);
+                user.Exists = true;
+                user.ProfileSet = sums.Profilestate == 1;
+                user.ProfileURL = STEAM_URL + user.Steam64ID;
+                user.LastOnline = UnixTimeStampToDateTime(sums.Lastlogoff);
+                user.TimeCreated = UnixTimeStampToDateTime(sums.Timecreated);
             }
             catch (Exception)
             {
-                if (u.PossibleSteamUsername == default(User).PossibleSteamUsername) { u.Exists = false; return u; }
+                if (user.PossibleSteamUsername == default(User).PossibleSteamUsername) { user.Exists = false; return user; }
             }
 
-            return u;
+            return user;
 
         }
         /// <summary>
         /// Gets the full information of steam user legacy.
         /// </summary>
         /// <returns>The full information of steam user legacy.</returns>
-        /// <param name="user">User.</param>
-        public User GetFullInformationOfSteamUser_Legacy(String user)
+        /// <param name="legacyUser">User.</param>
+        public User GetFullInformationOfSteamUserLegacy(String legacyUser)
         {
-            PlayerSum.Player sums;
-            BanJson.Player player;
-            User u = new User();
+            Player sums;
+            PlayerBan player;
+            User user = new User();
 
-            u.LeagacyID = user;
-            u.SteamUsername = "-1";
-            u.Steam64ID = Convert_To_64ID(u.LeagacyID);
+            user.LeagacyID = legacyUser;
+            user.SteamUsername = "-1";
+            user.Steam64ID = Convert_To_64ID(user.LeagacyID);
 
-            if (u.Steam64ID == -1) { u.Exists = false; return u; }
+            if (user.Steam64ID == -1) { user.Exists = false; return user; }
 
             try
             {
-                player = GetBanInfo(u.Steam64ID);
-                sums = GetPlayerSum(u.Steam64ID);
-                u.PossibleSteamUsername = sums.Personaname;
+                player = GetBanInfo(user.Steam64ID);
+                sums = GetPlayerSum(user.Steam64ID);
+                user.PossibleSteamUsername = sums.Personaname;
 
-                u.ProfileURL = STEAM_URL + u.Steam64ID;
-                u.TimeCreated = UnixTimeStampToDateTime(sums.Timecreated);
-                u.LastOnline = UnixTimeStampToDateTime(sums.Lastlogoff);
-                u.VacBan = player.VacBanned;
-                u.ProfileSet = sums.Profilestate == 1;
-                u.CommBan = player.CommunityBanned;
-                u.EcoBan = !player.EconomyBan.Contains("none");
+                user.ProfileURL = STEAM_URL + user.Steam64ID;
+                user.TimeCreated = UnixTimeStampToDateTime(sums.Timecreated);
+                user.LastOnline = UnixTimeStampToDateTime(sums.Lastlogoff);
+                user.VacBan = player.VacBanned;
+                user.ProfileSet = sums.Profilestate == 1;
+                user.CommBan = player.CommunityBanned;
+                user.EcoBan = !player.EconomyBan.Contains("none");
 
 
-                u.Exists = true;
+                user.Exists = true;
             }
             catch (Exception)
             {
-                if (u.PossibleSteamUsername == default(User).PossibleSteamUsername) { u.Exists = false; return u; }
+                if (user.PossibleSteamUsername == default(User).PossibleSteamUsername) { user.Exists = false; return user; }
             }
 
-            return u;
+            return user;
         }
         /// <summary>
         /// Gets the full information of steam user of type user.
         /// </summary>
         /// <returns>The full information of steam user user.</returns>
-        /// <param name="user">User.</param>
-        public User GetFullInformationOfSteamUser_User(String user)
+        /// <param name="steamUser">User.</param>
+        public User GetFullInformationOfSteamUserUser(String steamUser)
         {
 
-            PlayerSum.Player sums;
-            BanJson.Player player;
-            User u = new User();
+            Player sums;
+            PlayerBan player;
+            User user = new User();
 
-            u.SteamUsername = user;
-            u.Steam64ID = long.Parse(SteamCheck.GrabIDFromUsername(user));
-            u.LeagacyID = IDToRealSteamID(u.Steam64ID);
+            user.SteamUsername = steamUser;
+            user.Steam64ID = long.Parse(SteamCheck.GrabIDFromUsername(steamUser));
+            user.LeagacyID = IDToRealSteamID(user.Steam64ID);
 
-            if (u.Steam64ID == -1) { u.Exists = false; return u; }
+            if (user.Steam64ID == -1) { user.Exists = false; return user; }
 
-            player = GetBanInfo(u.Steam64ID);
-            sums = GetPlayerSum(u.Steam64ID);
-            u.Exists = true;
-            u.TimeCreated = UnixTimeStampToDateTime(sums.Timecreated);
-            u.CommBan = player.CommunityBanned;
-            u.VacBan = player.VacBanned;
-            u.EcoBan = !player.EconomyBan.Contains("none");
-            u.ProfileURL = STEAM_URL + u.Steam64ID;
-            u.ProfileSet = sums.Profilestate == 1;
-            u.PossibleSteamUsername = sums.Personaname;
+            player = GetBanInfo(user.Steam64ID);
+            sums = GetPlayerSum(user.Steam64ID);
+            user.Exists = true;
+            user.TimeCreated = UnixTimeStampToDateTime(sums.Timecreated);
+            user.CommBan = player.CommunityBanned;
+            user.VacBan = player.VacBanned;
+            user.EcoBan = !player.EconomyBan.Contains("none");
+            user.ProfileURL = STEAM_URL + user.Steam64ID;
+            user.ProfileSet = sums.Profilestate == 1;
+            user.PossibleSteamUsername = sums.Personaname;
 
-            return u;
+            return user;
         }
         /// <summary>
         /// Gets the ban info.
         /// </summary>
         /// <returns>The ban info.</returns>
         /// <param name="ID">Identifier.</param>
-        public BanJson.Player GetBanInfo(long ID)
+        public PlayerBan GetBanInfo(long ID)
         {
             var httpClient = new HttpClient();
             var response = httpClient.GetAsync("https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=12A1D1DE83F9932934EDD6DF2BA00463&steamids=" + ID).Result.Content.ReadAsStringAsync().Result;
 
             var jobject = JsonConvert.DeserializeObject<BanJson.Welcome>(response);
+
             return jobject.Players[0];
         }
 
@@ -189,7 +190,7 @@ namespace SteamUlti
         /// </summary>
         /// <returns>The player sum.</returns>
         /// <param name="ID">Identifier.</param>
-        public PlayerSum.Player GetPlayerSum(long ID)
+        public Player GetPlayerSum(long ID)
         {
             var httpClient = new HttpClient();
             var response = httpClient.GetStringAsync("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=12A1D1DE83F9932934EDD6DF2BA00463&steamids=" + ID).Result;
@@ -202,6 +203,7 @@ namespace SteamUlti
         //https://stackoverflow.com/a/46375289
         private String IDToRealSteamID(Int64 ID)
         {
+            //magic numbers much ?
             var lowbit = (ID - 76561197960265728) & 1;
             var highbit = (ID - 76561197960265728 - lowbit) / 2;
 
@@ -222,7 +224,7 @@ namespace SteamUlti
         /// </summary>
         /// <returns>The to legacy.</returns>
         /// <param name="IDList">IDL ist.</param>
-        public IEnumerator<String> Convert_To_Legacy(Int64[] IDList)
+        public IEnumerator<String> ConvertToLegacy(Int64[] IDList)
         {
             for (int i = 0; i < IDList.Length; i++)
             {
@@ -234,7 +236,7 @@ namespace SteamUlti
         /// </summary>
         /// <returns>The to 64 identifier.</returns>
         /// <param name="uList">User list.</param>
-        public IEnumerator<Int64> Convert_To_64ID(String[] uList)
+        public IEnumerator<Int64> ConvertTo64ID(String[] uList)
         {
             for (int i = 0; i < uList.Length; i++)
             {
@@ -247,14 +249,14 @@ namespace SteamUlti
         /// </summary>
         /// <returns>The to legacy.</returns>
         /// <param name="ID">Identifier.</param>
-        public String Convert_To_Legacy(Int64 ID) => IDToRealSteamID(ID);
+        public String ConvertToLegacy(Int64 ID) => IDToRealSteamID(ID);
 
         /// <summary>
         /// Converts to 64 identifier.
         /// </summary>
         /// <returns>The to 64 identifier.</returns>
         /// <param name="user">User.</param>
-        public Int64 Convert_To_64ID(String user) => RealSteamToID(user);
+        public Int64 ConvertTo64ID(String user) => RealSteamToID(user);
 
         private String DoRequest(String u)
         {
@@ -309,7 +311,7 @@ namespace SteamUlti
         /// </summary>
         /// <returns><c>true</c>, if user registered was checked, <c>false</c> otherwise.</returns>
         /// <param name="u">U.</param>
-        public Boolean Check_User_Registered(String u)
+        public Boolean CheckUserRegistered(String u)
         {
             return DoRequest(u).Contains("true");
         }
@@ -319,7 +321,7 @@ namespace SteamUlti
         /// <returns><c>true</c>, if user registered was checked, <c>false</c> otherwise.</returns>
         /// <param name="u">U.</param>
         /// <param name="Proxy">Proxy.</param>
-        public Boolean Check_User_Registered(String u, String[] Proxy)
+        public Boolean CheckUserRegistered(String u, String[] Proxy)
         {
             bool retry = true;
             while (retry)
