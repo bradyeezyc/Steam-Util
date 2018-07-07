@@ -111,7 +111,7 @@ namespace SteamUtil
 
             user.LeagacyID = legacyUser;
             user.SteamUsername = "-1";
-            user.Steam64ID = Convert_To_64ID(user.LeagacyID);
+            user.Steam64ID = ConvertTo64ID(user.LeagacyID);
 
             if (user.Steam64ID == -1) { user.Exists = false; return user; }
 

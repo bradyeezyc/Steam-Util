@@ -1,11 +1,9 @@
-﻿namespace PlayerSum
+﻿using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace PlayerSum
 {
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-    /// <summary>
-    /// Player sums.
-    /// </summary>
     public partial class PlayerSums
     {
         [JsonProperty("response")]

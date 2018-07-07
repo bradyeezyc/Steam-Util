@@ -1,15 +1,16 @@
-﻿namespace BanJson
-{
+﻿
+using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-    using System.Globalization;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
+namespace BanJson
+{
     public partial class Welcome
     {
         [JsonProperty("players")]
-        public Player[] Players { get; set; }
+        public PlayerBan[] Players { get; set; }
     }
-    public partial class Player
+    public partial class PlayerBan
     {
         [JsonProperty("SteamId")]
         public string SteamId { get; set; }

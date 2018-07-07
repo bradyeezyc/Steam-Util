@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace SteamUlti
+namespace SteamUtil
 {
     public struct User
     {
