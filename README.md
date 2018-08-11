@@ -9,7 +9,7 @@
 ```c#
 SteamCheck sc = new SteamCheck();
 var id = sc.GrabIDFromUser("username");
-if(id != "-1"){
+if(id != 0){
 	Console.Writeline(id);
 }else{
 	Console.Writeline("Username does not exist");
@@ -22,7 +22,7 @@ User user = sU.GetFullInformationOfSteamUser_Legacy("STEAM_0:0:123");
 if(user.Exists){
 	Boolean check = su.Compare_With_Email(user, "@hotmail.com")
 	if(check){
-		Console.Writeline($"The login is {user.user.PossibleSteamUsername}@hotmail.com");
+		Console.Writeline($"The login is {user.PossibleSteamUsername}@hotmail.com");
 	}
 }
 ```
@@ -34,11 +34,10 @@ if(check){
 	Console.Writeline("Registered!");
 }
 
-su.Proxies = File.ReadAllLines("proxies.txt");
-su.Users = File.ReadAllLines("users.txt");
-
-for(int i = 0;i<su.Users.Length;i++){
-	if(su.Check_User_Registered(su.Users[i],su.Proxies)){
+String[] Users = {"user1","user2","user3"};
+String[] Proxies = ....;
+for(int i = 0;i<Users.Length;i++){
+	if(su.Check_User_Registered(Users[i],Proxies)){
 		Console.Writeline("This account is registered");
 	}
 }
@@ -49,10 +48,6 @@ for(int i = 0;i<su.Users.Length;i++){
 #### Steam Util
 
 ##### Fields
-```c#
-String[] Proxies;
-String[] Emails;
-```
 
 > Compares the display name with an email to see if we can guess the account name.
 
