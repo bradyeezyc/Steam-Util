@@ -100,6 +100,12 @@ Boolean CheckUserRegistered(String u)
 Boolean CheckUserRegistered(String u, String[] Proxy)
 ```
 
+Returns a User object with the information
+```c#
+GetFullInformationOfSteamUserID
+GetFullInformationOfSteamUserLegacy
+GetFullInformationOfSteamUserUser
+```
 ### Steam Check
 
 > Gets the ID64 of any steam account, will return -1 if that account doesn't exist.
