@@ -102,9 +102,9 @@ Boolean CheckUserRegistered(String u, String[] Proxy)
 
 > Returns a User object with the information
 ```c#
-GetFullInformationOfSteamUserID
-GetFullInformationOfSteamUserLegacy
-GetFullInformationOfSteamUserUser
+User GetFullInformationOfSteamUserID
+User GetFullInformationOfSteamUserLegacy
+User GetFullInformationOfSteamUserUser
 ```
 ### Steam Check
 
