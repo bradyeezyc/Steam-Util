@@ -100,7 +100,7 @@ Boolean CheckUserRegistered(String u)
 Boolean CheckUserRegistered(String u, String[] Proxy)
 ```
 
-Returns a User object with the information
+> Returns a User object with the information
 ```c#
 GetFullInformationOfSteamUserID
 GetFullInformationOfSteamUserLegacy
