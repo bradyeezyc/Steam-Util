@@ -14,12 +14,14 @@ namespace SteamUtil
     /// </summary>
     public class SteamIDGrabber
     {
+        
         static SteamClient steamClient;
         static CallbackManager manager;
         static SteamUser steamUser;
         static string username;
         static ulong ID;
         static bool isRunning;
+
 
         /// <summary>
         /// Get's the ID of any steam LOGIN account.
@@ -56,7 +58,7 @@ namespace SteamUtil
                     Password = "mhiut76ytrdtg66",
                 });
             }
-            catch (System.ArgumentException)
+            catch (Exception)
             {
                 isRunning = false;
             }
@@ -88,18 +90,20 @@ namespace SteamUtil
     /// </summary>
     public class SteamUtilities
     {
-        public String STEAM_URL = "http://steamcommunity.com/profiles/";
+        private SteamIDGrabber _INTERNAL_GRAB = new SteamIDGrabber();
+        public const ulong STEAM_NOT_FOUND = 0;
+        private int ProxyUse = 0;
+        private int pIndex = 0;
+        public const String STEAM_URL = "http://steamcommunity.com/profiles/";
+        private String API_KEY;
+  
+        public String[] Proxies { get => Proxies; set => Proxies = value; }
 
-        static SteamIDGrabber GetSteam = new SteamIDGrabber();
+        public SteamUtilities(String APIKEY){
+            API_KEY = APIKEY;
+        }
 
-        String[] Emails { get => Emails; set => Emails = value; }
-        String[] Proxies { get => Proxies; set => Proxies = value; }
-
-        int ProxyUse = 0;
-        int pIndex = 0;
-
-
-        private static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
@@ -111,7 +115,7 @@ namespace SteamUtil
         /// </summary>
         /// <returns><c>true</c>, if date within last year, <c>false</c> otherwise.</returns>
         /// <param name="dt">Datetime.</param>
-        public static bool IsInLastYear(DateTime dt)
+        public bool IsInLastYear(DateTime dt)
         {
             return dt.Year == DateTime.Now.Year - 1;
         }
@@ -124,7 +128,8 @@ namespace SteamUtil
         /// <param name="EmailDomain">Email domain.</param>
         public Boolean CompareAccountWithEmail(User user, String EmailDomain)
         {
-            var id = GetSteam.GrabID(user.PossibleSteamUsername + EmailDomain);
+            
+            var id = _INTERNAL_GRAB.GrabID($"{user.PossibleSteamUsername}@{EmailDomain}");
             if (id != 0 && id == user.Steam64ID)
             {
                 return true;
@@ -138,7 +143,7 @@ namespace SteamUtil
         /// </summary>
         /// <returns>The full information of steam user identifier.</returns>
         /// <param name="ID">Identifier.</param>
-        public User GetFullInformationOfSteamUserID(ulong ID)
+        public User GetFullInformationOfSteamUser_ID(ulong ID)
         {
             User user = new User();
             Player sums;
@@ -176,15 +181,16 @@ namespace SteamUtil
         /// </summary>
         /// <returns>The full information of steam user legacy.</returns>
         /// <param name="legacyUser">User.</param>
-        public User GetFullInformationOfSteamUserLegacy(String legacyUser)
+        public User GetFullInformationOfSteamUser_Legacy(String legacyUser)
         {
             Player sums;
             PlayerBan player;
-            User user = new User();
-
-            user.LeagacyID = legacyUser;
-            user.SteamUsername = "-1";
-            user.Steam64ID = ConvertTo64ID(user.LeagacyID);
+            User user = new User
+            {
+                LeagacyID = legacyUser,
+                SteamUsername = "-1",
+                Steam64ID = ConvertTo64ID(legacyUser)
+            };
 
             if (user.Steam64ID == 0) { user.Exists = false; return user; }
 
@@ -216,18 +222,17 @@ namespace SteamUtil
         /// </summary>
         /// <returns>The full information of steam user user.</returns>
         /// <param name="steamUser">User.</param>
-        public User GetFullInformationOfSteamUserUser(String steamUser)
+        public User GetFullInformationOfSteamUser_User(String steamUser)
         {
             Player sums;
             PlayerBan player;
             User user = new User();
 
             user.SteamUsername = steamUser;
-            user.Steam64ID = GetSteam.GrabID(steamUser);
+            user.Steam64ID = _INTERNAL_GRAB.GrabID(steamUser);
             user.LeagacyID = IDToRealSteamID(user.Steam64ID);
 
             if (user.Steam64ID == 0) { user.Exists = false; return user; }
-            //hack because of the Flaky way steam handles accounts
 
             player = GetBanInfo(user.Steam64ID);
             if (player == null) { user.Exists = true; return user; }
@@ -254,9 +259,9 @@ namespace SteamUtil
             try
             {
                 var httpClient = new HttpClient();
-                var response = httpClient.GetAsync("https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=A8D363855B9422CBC1BB63D0B87E745E&steamids=" + ID).Result.Content.ReadAsStringAsync().Result;
+                var response = httpClient.GetAsync($"https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key={API_KEY}&steamids=" + ID).Result.Content.ReadAsStringAsync().Result;
 
-                Welcome jobject = JsonConvert.DeserializeObject<BanJson.Welcome>(response);
+                GetBanInfo jobject = JsonConvert.DeserializeObject<GetBanInfo>(response);
 
                 return jobject.Players[0];
             }
@@ -278,9 +283,9 @@ namespace SteamUtil
             try
             {
                 var httpClient = new HttpClient();
-                var response = httpClient.GetStringAsync("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=A8D363855B9422CBC1BB63D0B87E745E&steamids=" + ID).Result;
+                var response = httpClient.GetStringAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={API_KEY}&steamids=" + ID).Result;
 
-                var jobject = JsonConvert.DeserializeObject<PlayerSum.PlayerSums>(response);
+                var jobject = JsonConvert.DeserializeObject<PlayerSums>(response);
 
                 return jobject.Response.Players[0];
             }
@@ -294,7 +299,7 @@ namespace SteamUtil
         //https://stackoverflow.com/a/46375289
         private String IDToRealSteamID(ulong ID)
         {
-            //magic numbers much ?
+            //Valve's random numbers
             var lowbit = (ID - 76561197960265728) & 1;
             var highbit = (ID - 76561197960265728 - lowbit) / 2;
 
@@ -307,6 +312,7 @@ namespace SteamUtil
             ID64 += int.Parse(id_split[2]) * 2;
             if (id_split[1] == "1")
                 ID64 += 1;
+            
             return (ulong)ID64;
         }
 
