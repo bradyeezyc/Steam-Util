@@ -1,3 +1,4 @@
+
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -35,12 +36,12 @@ namespace BanJson
 
     public partial class GetBanInfo
     {
-        public static Welcome FromJson(string json) => JsonConvert.DeserializeObject<Welcome>(json, BanJson.Converter.Settings);
+        public static GetBanInfo FromJson(string json) => JsonConvert.DeserializeObject<GetBanInfo>(json, BanJson.Converter.Settings);
     }
 
     public static class Serialize
     {
-        public static string ToJson(this Welcome self) => JsonConvert.SerializeObject(self, BanJson.Converter.Settings);
+        public static string ToJson(this GetBanInfo self) => JsonConvert.SerializeObject(self, BanJson.Converter.Settings);
     }
 
     internal static class Converter
