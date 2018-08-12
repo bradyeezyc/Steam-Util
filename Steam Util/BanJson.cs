@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace BanJson
 {
-    public partial class Welcome
+    public partial class GetBanInfo
     {
         [JsonProperty("players")]
         public PlayerBan[] Players { get; set; }
@@ -34,7 +34,7 @@ namespace BanJson
         public string EconomyBan { get; set; }
     }
 
-    public partial class Welcome
+    public partial class GetBanInfo
     {
         public static Welcome FromJson(string json) => JsonConvert.DeserializeObject<Welcome>(json, BanJson.Converter.Settings);
     }
