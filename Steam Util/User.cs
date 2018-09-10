@@ -7,7 +7,7 @@ namespace SteamUtil
     public struct User
     {
         public String SteamUsername;
-        public long Steam64ID;
+        public ulong Steam64ID;
         public Boolean VacBan;
         public Boolean CommBan;
         public Boolean EcoBan;
